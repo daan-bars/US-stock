@@ -62,18 +62,11 @@ def download_stock_data(stk_list):
     Returns:
     - list: 失敗的股票代碼列表。
     """
-    # 先測試一檔試看看
-    stock = yf.Ticker('AAPL')
-
-    # 取得價量資料＋股利發放資料＋股票分割資料
-    stock.history(period='max')
-
     # 創立一個紀錄失敗股票的 list
     failed_list = []
-
     today_date = datetime.today().strftime('%Y%m%d')
-    folder_name = today_date
-    os.makedirs(folder_name, exist_ok=True)
+    base_folder = os.path.join(os.getcwd(),'Data', today_date)
+    os.makedirs(base_folder, exist_ok=True)
 
     # 開始迴圈抓資料囉！
     for i in stk_list:
@@ -87,7 +80,7 @@ def download_stock_data(stk_list):
             # 修改日期格式
             stock_data.index = stock_data.index.strftime('%Y-%m-%d')
             
-            file_path = os.path.join(folder_name, f'價量資料_{i}.csv')
+            file_path = os.path.join(base_folder, f'日成交資料_{i}.csv')
             stock_data.to_csv(file_path)
             
             # 停一秒，再抓下一檔，避免對伺服器造成負擔而被鎖住
@@ -100,20 +93,20 @@ def download_stock_data(stk_list):
 
 def download_financial_data(stk_list):
     """
-    繪製股票走勢圖。
+    下載一組股票的損益表、資產負債表、現金流量表。
 
     Parameters:
-    - stock_code (str): 股票代碼。
-    - days (int): 要顯示的天數，預設為 90 天。
+    - stk_list (list): 包含股票代碼的列表。
+    
+    Returns:
+    - failed_list (list): 下載失敗的股票列表。
     """
-    # 取得今天的日期
-    today_date = datetime.today().strftime('%Y%m%d')
 
     # 創建一個紀錄失敗股票的 list
     failed_list = []
 
     # 創建以今天日期為名的資料夾，如果不存在的話
-    base_folder = os.path.join(os.getcwd(),'Data', today_date)
+    base_folder = os.path.join(os.getcwd(),'Data', '財報資料')
 
     os.makedirs(base_folder, exist_ok=True)
 
@@ -152,7 +145,7 @@ def plot_stock_chart(stock_symbol='AAPL', days=90):
     """
     try:
         # 讀取 CSV 時指定 'DATE' 欄位為索引並轉換為 DatetimeIndex
-        file_path = f'./20231122/價量資料_{stock_symbol}.csv'
+        file_path = f'./Data/20231123/日成交資料_{stock_symbol}.csv'
         df = pd.read_csv(file_path, index_col='Date', parse_dates=True)
         df = df.drop(['Dividends', 'Stock Splits'], axis=1)
 
@@ -168,7 +161,7 @@ def plot_stock_chart(stock_symbol='AAPL', days=90):
         # 圖表參數
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
-        kwargs = dict(type='candle', mav=(5, 20, 60), volume=True, figratio=(10, 8), figscale=0.75,figsize=(23, 8),dpi=80, title=stock_symbol, style=s)
+        kwargs = dict(type='candle', mav=(5, 20, 60), volume=True, figratio=(10, 8), figscale=0.75,figsize=(23, 8), title=stock_symbol, style=s)
 
         # 繪製股票走勢圖
         mpf.plot(df_last_days, **kwargs)
@@ -193,7 +186,6 @@ def translate_and_save(csv_path='/', output_suffix='_tw'):
 
     # 讀取 CSV 文件
     df = pd.read_csv(csv_path)
-    print(translation_dict)
     # 修改所有行的第一列
     df.iloc[:, 0] = df.iloc[:, 0].map(translation_dict.get)
 
