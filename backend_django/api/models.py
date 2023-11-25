@@ -1,25 +1,28 @@
 from django.db import models
-import string
-import random
 
 
-def generate_unique_code():
-    length = 6
+# 股票
+class Stock(models.Model):
+    symbol = models.CharField(max_length=5, default="")
+    name = models.CharField(max_length=50, default="")
+    description = models.CharField(max_length=200, default="")
+    sector = models.CharField(max_length=50, default="")
 
-    while True:
-        code = "".join(random.choices(string.ascii_uppercase, k=length))
-        if Room.objects.filter(code=code).count() == 0:
-            break
-
-    return code
-
-
-# Create your models here.
+    def __str__(self):
+        return f"<{self.symbol}>: {self.name}"
 
 
-class Room(models.Model):
-    code = models.CharField(max_length=8, default="", unique=True)
-    host = models.CharField(max_length=50, unique=True)
-    guest_can_pause = models.BooleanField(null=False, default=False)
-    votes_to_skip = models.IntegerField(null=False, default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
+# 歷史資料
+class Historical(models.Model):
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="Historical"
+    )
+    date = models.DateField(default="")
+    open = models.FloatField(default=0.0)
+    high = models.FloatField(default=0.0)
+    low = models.FloatField(default=0.0)
+    close = models.FloatField(default=0.0)
+    volume = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"<{self.stock.symbol}>: {self.date} O:{self.open} H:{self.high} L:{self.low} C:{self.close} V:{self.volume}"

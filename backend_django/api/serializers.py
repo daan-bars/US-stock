@@ -1,15 +1,16 @@
 from rest_framework import serializers
-from .models import Room
+from .models import Stock, Historical
 
 
-class RoomSerializer(serializers.ModelSerializer):
+class StockSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Room
-        fields = (
-            "id",
-            "code",
-            "host",
-            "guest_can_pause",
-            "votes_to_skip",
-            "created_at",
-        )
+        model = Stock
+        fields = ["symbol", "name"]
+
+
+class HistoricalSerializer(serializers.ModelSerializer):
+    stock = StockSerializer()
+
+    class Meta:
+        model = Historical
+        fields = "__all__"
