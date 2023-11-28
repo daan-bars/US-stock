@@ -6,7 +6,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from api import views
 
 router = DefaultRouter()
-router.register(r"stock", views.StockViewSet)
+router.register(r"Stock", views.StockViewSet)
 router.register(r"Historical", views.HistoricalViewSet)
 
 urlpatterns = [

@@ -9,7 +9,7 @@ class TestsStockModels:
         # Act
         x = stock_factory(symbol="AAPL", name="Apple")
         # Assert
-        assert x.__str__() == "<AAPL>: Apple"
+        assert x.__str__() == "AAPL"
 
 
 class TestHistoricalModels:

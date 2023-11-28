@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import RoomView
+from .views import StockViewSet
 
 urlpatterns = [
-    path("room", RoomView.as_view()),
+    path("Stock", StockViewSet()),
 ]
