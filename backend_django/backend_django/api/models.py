@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .steps import StepField
@@ -28,7 +29,7 @@ class Stock(models.Model):
 # 歷史資料模型
 class Historical(models.Model):
     stock = models.ForeignKey(
-        Stock, on_delete=models.CASCADE, related_name="Historical"
+        Stock, on_delete=models.CASCADE, related_name="historical"
     )
     date = models.DateField(default="")
     open = models.FloatField(default=0.0)
@@ -47,37 +48,46 @@ class Historical(models.Model):
 # 回測策略模型
 class BackTesting(models.Model):
     stock = models.ForeignKey(
-        Stock, on_delete=models.CASCADE, related_name="backTesting"
+        Stock, on_delete=models.CASCADE, related_name="back_testing"
     )
     name = models.CharField(max_length=30, default="")
     date = models.DateField(default="")
-    strategyNumber = models.IntegerField(default=0)
+    strategy_number = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"<{self.stock.symbol}> {self.strategyNumber} : {self.name}"
+        return f"<{self.stock.symbol}> {self.strategy_number} : {self.name}"
 
     def save(self, *args, **kwargs):
         if self._state.adding or not self.strategyNumber:
             last_strategy = (
                 BackTesting.objects.filter(stock=self.stock)
-                .order_by("-strategyNumber")
+                .order_by("-strategy_number")
                 .first()
             )
-            self.strategyNumber = (
-                0 if not last_strategy else last_strategy.strategyNumber + 1
+            self.strategy_number = (
+                0 if not last_strategy else last_strategy.strategy_number + 1
             )
         super().save(*args, **kwargs)
 
 
 # 回測步驟模型
 class StrategySteps(models.Model):
-    backTesting = models.ForeignKey(
-        BackTesting, on_delete=models.CASCADE, related_name="strategySteps"
+    back_testing = models.ForeignKey(
+        BackTesting, on_delete=models.CASCADE, related_name="strategy_steps"
     )
-    name = models.CharField(max_length=30, default="")
-    strategyNumber = models.IntegerField(default=0)
-    step = StepField(unique_for_field="backTesting", blank=True)  # 使用 AutoField 來自動增加
+    description = models.CharField(max_length=30, default="")
+    step = StepField(unique_for_field="back_testing", blank=True)  # 使用 AutoField 來自動增加
+
+    def clean(self):
+        qs = StrategySteps.objects.filter(back_testing=self.back_testing)
+        for obj in qs:
+            if self.id != obj.id and self.step == obj.step:
+                raise ValidationError("此步驟已存在")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(StrategySteps, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.backTesting} 策略:{self.strategyNumber} 步驟:{self.step} 技術指標: {self.name}"
+        return str(self.description)

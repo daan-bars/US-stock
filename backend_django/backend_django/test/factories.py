@@ -1,7 +1,7 @@
 import factory
 from datetime import datetime, timedelta
 
-from api.models import Stock, Historical, BackTesting, StrategySteps
+from backend_django.api.models import Stock, Historical, BackTesting, StrategySteps
 
 
 class StockFactory(factory.django.DjangoModelFactory):
@@ -39,7 +39,7 @@ class BackTestingFactory(factory.django.DjangoModelFactory):
     date = factory.Sequence(
         lambda n: (datetime(2023, 1, 1) + timedelta(days=n)).strftime("%Y-%m-%d")
     )  # 2023-01-01 ~2023-XX-XX
-    strategyNumber = factory.Sequence(lambda n: n)
+    strategy_number = factory.Sequence(lambda n: n)
     is_active = True
 
 
@@ -47,6 +47,6 @@ class StrategyStepsFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = StrategySteps
 
-    backTesting = factory.SubFactory(BackTestingFactory)
-    step = factory.Sequence(lambda n: f"step_{n}")
-    name = factory.Sequence(lambda n: f"name_{n}")
+    back_testing = factory.SubFactory(BackTestingFactory)
+    step = factory.Sequence(lambda n: f"{n}")
+    description = factory.Sequence(lambda n: f"description_{n}")

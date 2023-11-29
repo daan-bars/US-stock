@@ -1,6 +1,7 @@
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     # Internal apps
-    "api.apps.ApiConfig",
+    "backend_django.api",
 ]
 
 MIDDLEWARE = [

@@ -19,15 +19,13 @@ class StepField(models.PositiveIntegerField):
     def _check_for_field_attribute(self, **kwargs):
         if self.unique_for_field is None:
             return [
-                checks.Error("OrderField must define a 'unique_for_field' attribute")
+                checks.Error("StepField must define a 'unique_for_field' attribute")
             ]
         elif self.unique_for_field not in [
             f.name for f in self.model._meta.get_fields()
         ]:
             return [
-                checks.Error(
-                    "OrderField entered does not match an existing model field"
-                )
+                checks.Error("StepField entered does not match an existing model field")
             ]
         return []
 

@@ -3,11 +3,13 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from api import views
+from backend_django.api import views
 
 router = DefaultRouter()
 router.register(r"Stock", views.StockViewSet)
 router.register(r"Historical", views.HistoricalViewSet)
+router.register(r"BackTesting", views.BackTestingViewSet)
+router.register(r"StrategySteps", views.StrategyStepsViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

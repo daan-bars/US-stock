@@ -31,6 +31,5 @@ class TestHistoricalEndpoint:
         # Assert
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 100
-        print(json.loads(response.content))
 
     pass
